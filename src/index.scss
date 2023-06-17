@@ -1,0 +1,20 @@
+@import '@carbon/react';
+@import '@carbon/styles';
+@import '@carbon/ibm-products/scss/index';
+
+
+.cds--css-grid-column {
+    margin-bottom: 2rem;
+}
+
+.c4p--card__content-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.card-placeholder{
+    min-width: 100%;
+    min-height: 200px;
+}
