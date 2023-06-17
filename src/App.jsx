@@ -19,6 +19,8 @@ function App() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [editId, setEditId] = useState(0);
   const [form, setForm] = useState({
     title: "",
     paragraph: "",
@@ -44,24 +46,42 @@ function App() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(form),
-    })
-      .then(() => {
-        handleGetPosts()
-      })
+    }).then(() => {
+      handleGetPosts();
+    });
   };
 
-  const handleEdit = (id) => {
-    console.log("edit", id);
+  const handleUpdate = () => {
+    setLoading(true);
+    setOpenModal(false);
+    fetch(`http://localhost:3000/posts/${editId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    }).then(() => {
+      handleGetPosts();
+    });
+  };
+
+  const handleEdit = (post) => {
+    setEdit(true);
+    setEditId(post.id);
+    setOpenModal(true);
+    setForm({
+      title: `${post.title}`,
+      paragraph: `${post.paragraph}`,
+    });
   };
 
   const handleDelete = (id) => {
     setLoading(true);
     fetch(`http://localhost:3000/posts/${id}`, {
       method: "DELETE",
-    })
-      .then(() => {
-        handleGetPosts()
-      })
+    }).then(() => {
+      handleGetPosts();
+    });
   };
 
   const handleGetPosts = () => {
@@ -69,11 +89,11 @@ function App() {
       .then((res) => res.json())
       .then((data) => setPosts(data))
       .finally(() => setLoading(false));
-  }
+  };
 
   useEffect(() => {
     setLoading(true);
-    handleGetPosts()
+    handleGetPosts();
   }, []);
 
   if (loading)
@@ -132,9 +152,15 @@ function App() {
                     onChange={handleChange}
                     name="paragraph"
                   />
-                  <Button type="submit" onClick={handleSubmit}>
-                    Submit
-                  </Button>
+                  {edit ? (
+                    <Button type="submit" onClick={handleUpdate}>
+                      Update
+                    </Button>
+                  ) : (
+                    <Button type="submit" onClick={handleSubmit}>
+                      Submit
+                    </Button>
+                  )}
                 </div>
               </FormGroup>
             </ModalBody>
@@ -153,7 +179,7 @@ function App() {
                   icon: Edit,
                   iconDescription: "Edit",
                   id: "1",
-                  onClick: () => handleEdit(post.id),
+                  onClick: () => handleEdit(post),
                 },
                 {
                   icon: TrashCan,
